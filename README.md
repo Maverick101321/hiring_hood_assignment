@@ -6,12 +6,7 @@ This repository contains the work for a two-part technical internship assignment
 
 ## 📁 Repository Structure
 
-.
-├── tts_project/          # Task 1: Text-to-Speech Implementation
-│   └── README.md
-├── mistral_chat/         # Task 2: DeepSeek / Mistral API Integration
-│   └── README.md
-└── README.md             # ← You are here
+├── tts_project/ # Task 1: Text-to-Speech Implementation │ └── README.md ├── mistral_chat/ # Task 2: DeepSeek / Mistral API Integration │ └── README.md └── README.md # ← You are here
 
 ---
 
