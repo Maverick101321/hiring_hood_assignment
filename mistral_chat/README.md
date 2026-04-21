@@ -37,7 +37,7 @@ Commands:
 python server.py
 ```
 
-Open [http://localhost:5000](http://localhost:5000).
+Open [http://localhost:5000](http://localhost:5050).
 
 ## Files
 
