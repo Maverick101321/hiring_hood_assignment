@@ -67,11 +67,12 @@ def main() -> None:
                 lang=language,
             )
             st.success(f"Speech generated successfully: {generated_path.name}")
+            audio_bytes = generated_path.read_bytes()
 
             if generated_path.suffix == ".wav":
-                st.audio("output/result.wav")
+                st.audio(audio_bytes, format="audio/wav")
             else:
-                st.audio(str(generated_path))
+                st.audio(audio_bytes, format="audio/mpeg")
                 st.info("pyttsx3 was unavailable, so audio was saved as MP3 via gTTS.")
         except Exception as error:
             st.error(f"Could not generate speech: {error}")
