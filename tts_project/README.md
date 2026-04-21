@@ -1,6 +1,6 @@
 # TTS Project
 
-A small Python text-to-speech project with input validation, local speech generation through `pyttsx3`, online fallback through `gTTS`, a Streamlit web interface, and pytest coverage for text validation.
+A small Python text-to-speech project with input validation, browser-friendly speech generation through `gTTS`, local fallback through `pyttsx3`, a Streamlit web interface, and pytest coverage for text validation.
 
 ## Setup
 
@@ -18,6 +18,10 @@ streamlit run app.py
 
 Enter text, select a local voice if available, choose the speech rate and volume, then click **🎙️ Generate Speech**. Audio is saved in the `output/` folder and played directly in the browser.
 
+## Audio Engine Order
+
+The app now uses `gTTS` as the primary speech engine because it produces browser-friendly MP3 output more reliably. If `gTTS` is unavailable or fails, the project falls back to local `pyttsx3` generation and saves a WAV file instead.
+
 ## Run Tests
 
 From inside the `tts_project/` directory:
@@ -28,9 +32,9 @@ pytest tests/
 
 ## File Guide
 
-- `tts_engine.py`: Defines `TTSEngine`, lists installed pyttsx3 voices, generates `.wav` output locally, and falls back to gTTS `.mp3` output if pyttsx3 fails.
+- `tts_engine.py`: Defines `TTSEngine`, lists installed pyttsx3 voices for optional fallback use, generates primary `.mp3` output with `gTTS`, and falls back to local `.wav` output with `pyttsx3` if needed.
 - `validator.py`: Defines `validate_text()`, which rejects empty input, strips whitespace, removes unsupported TTS characters, trims excessive symbol bursts, and truncates text longer than 5000 characters with a warning.
-- `app.py`: Streamlit web app with text input, voice selection, speech rate and volume controls, and browser audio playback.
+- `app.py`: Streamlit web app with text input, gTTS language selection, optional pyttsx3 fallback voice selection, speech rate and volume controls, and browser audio playback.
 - `tests/test_validator.py`: Pytest unit tests for empty input, whitespace input, special character cleanup, normal cleanup, and truncation behavior.
 - `requirements.txt`: Python dependencies needed for the app, TTS engines, audio playback support, and tests.
 - `output/`: Destination folder for generated audio files.

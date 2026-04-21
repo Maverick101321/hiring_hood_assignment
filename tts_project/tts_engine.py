@@ -1,4 +1,4 @@
-"""Text-to-speech engine abstraction with pyttsx3 and gTTS fallback."""
+"""Text-to-speech engine abstraction with gTTS primary and pyttsx3 fallback."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ OUTPUT_DIR = Path(__file__).resolve().parent / "output"
 
 
 class TTSEngine:
-    """Generate speech using local pyttsx3 voices, with online gTTS fallback."""
+    """Generate speech using browser-friendly gTTS, with pyttsx3 fallback."""
 
     def __init__(self) -> None:
         """Initialize pyttsx3 and cache all voices available on this machine."""
@@ -64,24 +64,31 @@ class TTSEngine:
 
         Args:
             text: User text to synthesize.
-            voice_id: pyttsx3 voice id selected by the user.
+            voice_id: pyttsx3 voice id selected by the user for fallback use.
             rate: Speech rate in words per minute.
             volume: Volume between 0.0 and 1.0.
-            save_path: Target output file. pyttsx3 writes WAV; gTTS fallback
-                writes an MP3 with the same stem.
-            lang: Language/accent code used by the gTTS fallback.
+            save_path: Target output file stem. gTTS writes an MP3; pyttsx3
+                fallback writes WAV with the same stem.
+            lang: Language/accent code used by the primary gTTS path.
 
         Returns:
-            The actual generated audio path. This is ``save_path`` for pyttsx3
-            and a sibling ``.mp3`` path if gTTS fallback was needed.
+            The actual generated audio path. This is a sibling ``.mp3`` path
+            for gTTS and ``save_path`` as WAV if pyttsx3 fallback is needed.
         """
         cleaned_text = validate_text(text)
         output_path = self._resolve_output_path(save_path, suffix=".wav")
         fallback_path = output_path.with_suffix(".mp3")
 
         try:
-            output_path.unlink(missing_ok=True)
             fallback_path.unlink(missing_ok=True)
+            from gtts import gTTS
+
+            tts = gTTS(text=cleaned_text, lang=lang)
+            tts.save(str(fallback_path))
+            self._validate_mp3_output(fallback_path)
+            return fallback_path
+        except Exception:
+            output_path.unlink(missing_ok=True)
 
             engine = pyttsx3.init()
             if voice_id:
@@ -99,13 +106,6 @@ class TTSEngine:
             self._normalize_audio_file(output_path)
             self._validate_audio_output(output_path)
             return output_path
-        except Exception:
-            from gtts import gTTS
-
-            fallback_path.unlink(missing_ok=True)
-            tts = gTTS(text=cleaned_text, lang=lang)
-            tts.save(str(fallback_path))
-            return fallback_path
 
     @staticmethod
     def _format_languages(languages: list[Any]) -> str:
@@ -182,3 +182,9 @@ class TTSEngine:
 
         if frame_rate <= 0 or frame_count <= 0:
             raise RuntimeError("Generated audio file contains no playable frames.")
+
+    @staticmethod
+    def _validate_mp3_output(audio_path: Path) -> None:
+        """Reject empty MP3 files from the primary gTTS path."""
+        if not audio_path.exists() or audio_path.stat().st_size < 512:
+            raise RuntimeError("Generated MP3 file is unexpectedly small.")

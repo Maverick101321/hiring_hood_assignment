@@ -22,7 +22,7 @@ def main() -> None:
     """Render the Streamlit interface and handle speech generation."""
     st.set_page_config(page_title="TTS Generator", page_icon="🎙️")
     st.title("Text-to-Speech Generator")
-    st.write("Type some text, choose a voice, and generate playable speech.")
+    st.write("Type some text and generate browser-friendly speech audio.")
 
     engine = get_tts_engine()
     voices = engine.list_voices()
@@ -44,16 +44,17 @@ def main() -> None:
             format_func=lambda index: voice_labels[index],
         )
         selected_voice_id = voices[selected_voice_index]["id"]
+        st.caption("Local voice selection is used only if gTTS is unavailable.")
     else:
-        st.info("No local pyttsx3 voices were detected. The app will try gTTS.")
+        st.info("No local pyttsx3 voices were detected. gTTS remains the primary engine.")
         selected_voice_id = None
 
     rate = st.slider("Speech rate (WPM)", min_value=50, max_value=300, value=150)
     volume = st.slider("Volume", min_value=0.0, max_value=1.0, value=1.0)
     language = st.text_input(
-        "Fallback gTTS language/accent code",
+        "gTTS language/accent code",
         value="en",
-        help="Used only if pyttsx3 fails. Examples: en, en-uk, hi, es, fr.",
+        help="Primary engine setting. Examples: en, en-uk, hi, es, fr.",
     )
 
     if st.button("🎙️ Generate Speech"):
@@ -71,9 +72,10 @@ def main() -> None:
 
             if generated_path.suffix == ".wav":
                 st.audio(audio_bytes, format="audio/wav")
+                st.info("gTTS was unavailable, so local pyttsx3 fallback created a WAV file.")
             else:
                 st.audio(audio_bytes, format="audio/mpeg")
-                st.info("pyttsx3 was unavailable, so audio was saved as MP3 via gTTS.")
+                st.info("Audio was generated with gTTS and saved as MP3 for browser playback.")
         except Exception as error:
             st.error(f"Could not generate speech: {error}")
 
