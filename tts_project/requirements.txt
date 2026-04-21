@@ -1,0 +1,5 @@
+pyttsx3
+gTTS
+streamlit
+pytest
+pygame

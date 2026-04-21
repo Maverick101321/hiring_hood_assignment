@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mistral Chat</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="app-header">
+    <h1>💬 Mistral Chat</h1>
+    <button id="clearButton" class="secondary-button" type="button">Clear Chat</button>
+  </header>
+
+  <main id="chatWindow" class="chat-window" aria-live="polite">
+    <div class="message ai-message">
+      <div class="bubble">Hi. Send a message when you are ready.</div>
+    </div>
+  </main>
+
+  <footer class="input-bar">
+    <select id="formatSelect" aria-label="Response format">
+      <option value="plain">plain</option>
+      <option value="bullets">bullets</option>
+      <option value="numbered">numbered</option>
+      <option value="auto">auto</option>
+    </select>
+    <input id="messageInput" type="text" placeholder="Type your message..." autocomplete="off">
+    <button id="sendButton" type="button">Send</button>
+  </footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

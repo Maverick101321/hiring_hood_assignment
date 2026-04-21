@@ -1,0 +1,4 @@
+mistralai
+flask
+python-dotenv
+pytest
